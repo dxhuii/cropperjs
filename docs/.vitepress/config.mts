@@ -7,7 +7,7 @@ import lerna from '../../lerna.json';
 const packages = resolve(__dirname, '../../packages');
 
 export default defineConfig({
-  base: '/cropperjs/',
+  base: '/',
   head: [
     [
       'link',
