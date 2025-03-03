@@ -14,14 +14,14 @@ export default defineConfig({
       {
         rel: 'apple-touch-icon',
         sizes: '180x180',
-        href: '/cropperjs/apple-touch-icon.png',
+        href: '/apple-touch-icon.png',
       },
     ],
     [
       'link',
       {
         rel: 'icon',
-        href: '/cropperjs/favicon.ico',
+        href: '/favicon.ico',
       },
     ],
     [
@@ -30,7 +30,7 @@ export default defineConfig({
         rel: 'icon',
         type: 'image/png',
         size: '16x16',
-        href: '/cropperjs/favicon-16x16.png',
+        href: '/favicon-16x16.png',
       },
     ],
     [
@@ -39,7 +39,7 @@ export default defineConfig({
         rel: 'icon',
         type: 'image/png',
         size: '32x32',
-        href: '/cropperjs/favicon-32x32.png',
+        href: '/favicon-32x32.png',
       },
     ],
     [
