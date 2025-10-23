@@ -199,6 +199,22 @@ export function emit(
   }));
 }
 
+/**
+ * Get the real event target by checking composed path.
+ * This is useful when dealing with events that can cross shadow DOM boundaries.
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath}
+ * @param {Event} event The event object.
+ * @returns {EventTarget | null} The first element in the composed path, or the original event target.
+ */
+export function getComposedPathTarget(event: Event): EventTarget | null {
+  if (typeof (event as any).composedPath === 'function') {
+    const path = (event as any).composedPath();
+    return path.find(isElement) || event.target;
+  }
+
+  return event.target;
+}
+
 const resolvedPromise: Promise<any> = Promise.resolve();
 
 /**
@@ -211,6 +227,30 @@ export function nextTick(context?: unknown, callback?: () => void): Promise<void
   return callback
     ? resolvedPromise.then(context ? callback.bind(context) : callback)
     : resolvedPromise;
+}
+
+/**
+ * Get the root document node.
+ * @param {Element} element The target element.
+ * @returns {Document|DocumentFragment|null} The document node.
+ */
+export function getRootDocument(element: Element): Document | DocumentFragment | null {
+  const rootNode = element.getRootNode();
+
+  switch (rootNode.nodeType) {
+    case 1:
+      return rootNode.ownerDocument;
+
+    case 9:
+      return rootNode as Document;
+
+    case 11:
+      return rootNode as DocumentFragment;
+
+    default:
+  }
+
+  return null;
 }
 
 /**

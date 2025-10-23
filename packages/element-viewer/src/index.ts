@@ -11,6 +11,7 @@ import {
   EVENT_CHANGE,
   EVENT_LOAD,
   EVENT_TRANSFORM,
+  getRootDocument,
   isElement,
   off,
   on,
@@ -92,7 +93,7 @@ export default class CropperViewer extends CropperElement {
     let $selection: CropperSelection | null = null;
 
     if (this.selection) {
-      $selection = this.ownerDocument.querySelector(this.selection);
+      $selection = getRootDocument(this)?.querySelector(this.selection) ?? null;
     } else {
       $selection = this.closest(this.$getTagNameOf(CROPPER_SELECTION));
     }
@@ -148,7 +149,7 @@ export default class CropperViewer extends CropperElement {
   }
 
   protected $handleSelectionChange(event: Event): void {
-    this.$render((event as CustomEvent).detail);
+    this.$render(event.defaultPrevented ? this.$selection : (event as CustomEvent).detail);
   }
 
   protected $handleSourceImageLoad(): void {
@@ -159,9 +160,7 @@ export default class CropperViewer extends CropperElement {
     if (newSrc && newSrc !== oldSrc) {
       $image.setAttribute('src', newSrc);
       $image.$ready(() => {
-        setTimeout(() => {
-          this.$render();
-        }, 50);
+        this.$render();
       });
     }
   }
@@ -237,7 +236,10 @@ export default class CropperViewer extends CropperElement {
     this.$setStyles(styles);
 
     if (this.$sourceImage) {
-      this.$transformImageByOffset(matrix ?? this.$sourceImage.$getTransform(), -x, -y);
+      // Transform the image by the selection offset after the next DOM update cycle
+      setTimeout(() => {
+        this.$transformImageByOffset(matrix ?? this.$sourceImage.$getTransform(), -x, -y);
+      });
     }
   }
 

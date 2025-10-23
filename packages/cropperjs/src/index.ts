@@ -2,6 +2,7 @@ import {
   CROPPER_CANVAS,
   CROPPER_IMAGE,
   CROPPER_SELECTION,
+  getRootDocument,
   isElement,
   isString,
 } from '@cropper/utils';
@@ -65,12 +66,11 @@ export default class Cropper {
     options = { ...DEFAULT_OPTIONS, ...options };
     this.options = options;
 
-    const { ownerDocument } = element;
     let { container } = options;
 
     if (container) {
       if (isString(container)) {
-        container = ownerDocument.querySelector(container) as Element;
+        container = getRootDocument(element)?.querySelector(container) as Element;
       }
 
       if (!isElement(container)) {
@@ -82,7 +82,7 @@ export default class Cropper {
       if (element.parentElement) {
         container = element.parentElement;
       } else {
-        container = ownerDocument.body;
+        container = element.ownerDocument.body;
       }
     }
 
@@ -109,6 +109,24 @@ export default class Cropper {
       Array.from(documentFragment.querySelectorAll(CROPPER_IMAGE)).forEach((image) => {
         image.setAttribute('src', src);
         image.setAttribute('alt', (element as HTMLImageElement).alt || 'The image to crop');
+
+        // Inherit additional attributes from HTMLImageElement
+        if (tagName === 'img') {
+          [
+            'crossorigin',
+            'decoding',
+            'elementtiming',
+            'fetchpriority',
+            'loading',
+            'referrerpolicy',
+            'sizes',
+            'srcset',
+          ].forEach((attribute) => {
+            if ((element as HTMLImageElement).hasAttribute(attribute)) {
+              image.setAttribute(attribute, (element as HTMLImageElement).getAttribute(attribute) || '');
+            }
+          });
+        }
       });
 
       if (element.parentElement) {
@@ -134,5 +152,17 @@ export default class Cropper {
 
   getCropperSelections(): NodeListOf<CropperSelection> | null {
     return this.container.querySelectorAll(CROPPER_SELECTION);
+  }
+
+  destroy(): void {
+    const cropperCanvas = this.getCropperCanvas();
+
+    if (cropperCanvas) {
+      cropperCanvas.parentElement?.removeChild(cropperCanvas);
+    }
+
+    if (this.element) {
+      this.element.style.display = '';
+    }
   }
 }

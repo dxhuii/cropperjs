@@ -16,12 +16,6 @@ describe('Cropper', () => {
       }).not.toThrow();
     });
 
-    it('should support `HTMLCanvasElement`', () => {
-      expect(() => {
-        new Cropper(document.createElement('canvas'));
-      }).not.toThrow();
-    });
-
     it('should not support other elements', () => {
       expect(() => {
         new Cropper(document.createElement('div') as HTMLImageElement);
@@ -41,11 +35,14 @@ describe('Cropper', () => {
       it('should be the parent element if it exists by default', () => {
         const container = document.createElement('div');
         const image = new Image();
-        const cropper = new Cropper(image);
 
         container.appendChild(image);
+        document.body.appendChild(container);
+
+        const cropper = new Cropper(image);
+
         expect(cropper.options.container).toBeUndefined();
-        expect(container.contains(document.querySelector(CROPPER_CANVAS))).toBeTruthy();
+        expect(cropper.container).toBe(container);
       });
 
       it('should be the document body if the parent element does not exist by default', () => {
@@ -59,12 +56,16 @@ describe('Cropper', () => {
       it('should use the given element', () => {
         const container = document.createElement('div');
         const image = new Image();
+
+        container.appendChild(image);
+        document.body.appendChild(container);
+
         const cropper = new Cropper(image, {
           container,
         });
 
         expect(cropper.options.container).toBe(container);
-        expect(container.contains(document.querySelector(CROPPER_CANVAS))).toBeTruthy();
+        expect(cropper.container).toBe(container);
       });
     });
 
@@ -119,8 +120,15 @@ describe('Cropper', () => {
 
     describe('getCropperSelections', () => {
       it('should return all the cropper selection elements', () => {
+        const container = document.createElement('div');
         const image = new Image();
-        const cropper = new Cropper(image);
+
+        container.appendChild(image);
+        document.body.appendChild(container);
+
+        const cropper = new Cropper(image, {
+          container,
+        });
         const selections = cropper.getCropperSelections();
 
         expect(selections).toHaveLength(1);
@@ -128,6 +136,24 @@ describe('Cropper', () => {
         if (selections) {
           expect(selections[0]).toBeInstanceOf(CropperSelection);
         }
+      });
+    });
+
+    describe('destroy', () => {
+      it('should destroy the cropper instance', () => {
+        const container = document.createElement('div');
+        const image = new Image();
+
+        container.appendChild(image);
+        document.body.appendChild(container);
+
+        const cropper = new Cropper(image, {
+          container,
+        });
+
+        cropper.destroy();
+        expect(image.style.display).toBe('');
+        expect(container.childElementCount).toBe(1);
       });
     });
   });

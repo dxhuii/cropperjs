@@ -27,6 +27,7 @@ import {
   isNumber,
   isPlainObject,
   isPositiveNumber,
+  getComposedPathTarget,
   off,
   on,
 } from '@cropper/utils';
@@ -395,11 +396,14 @@ export default class CropperSelection extends CropperElement {
 
     const { relatedEvent } = detail;
     let { action } = detail;
+    const relatedTarget = relatedEvent
+      ? getComposedPathTarget(relatedEvent)
+      : null;
 
     // Switching to another selection
     if (!action && this.multiple) {
       // Get the `action` property from the focusing in selection
-      action = this.$action || relatedEvent?.target.action;
+      action = this.$action || (relatedTarget as any)?.action;
       this.$action = action;
     }
 
@@ -409,9 +413,9 @@ export default class CropperSelection extends CropperElement {
       return;
     }
 
-    const moveX = detail.endX - detail.startX;
-    const moveY = detail.endY - detail.startY;
     const { width, height } = this;
+    let moveX = detail.endX - detail.startX;
+    let moveY = detail.endY - detail.startY;
     let { aspectRatio } = this;
 
     // Locking aspect ratio by holding shift key
@@ -421,7 +425,14 @@ export default class CropperSelection extends CropperElement {
 
     switch (action) {
       case ACTION_SELECT:
-        if (moveX !== 0 && moveY !== 0) {
+        if (moveX !== 0 || moveY !== 0) {
+          // Force to create a square selection for better user experience
+          if (moveX === 0) {
+            moveX = moveY;
+          } else if (moveY === 0) {
+            moveY = moveX;
+          }
+
           const { $canvas } = this;
           const offset = getOffset(currentTarget as Element);
 

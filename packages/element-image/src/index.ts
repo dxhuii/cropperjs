@@ -31,7 +31,8 @@ const NATIVE_ATTRIBUTES = [
   'alt',
   'crossorigin',
   'decoding',
-  'importance',
+  'elementtiming',
+  'fetchpriority',
   'loading',
   'referrerpolicy',
   'sizes',
@@ -71,6 +72,27 @@ export default class CropperImage extends CropperElement {
   slottable = false;
 
   translatable = false;
+
+  // Native attributes
+  alt = '';
+
+  crossorigin = '';
+
+  decoding = '';
+
+  elementtiming = '';
+
+  fetchpriority = '';
+
+  loading = '';
+
+  referrerpolicy = '';
+
+  sizes = '';
+
+  src = '';
+
+  srcset = '';
 
   protected set $canvas(element: CropperCanvas) {
     canvasCache.set(this, element);
@@ -364,7 +386,11 @@ export default class CropperImage extends CropperElement {
         const onLoad = () => {
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           off($image, EVENT_ERROR, onError);
-          resolve($image);
+
+          // Ensure the image is fully rendered.
+          setTimeout(() => {
+            resolve($image);
+          });
         };
         const onError = () => {
           off($image, EVENT_LOAD, onLoad);

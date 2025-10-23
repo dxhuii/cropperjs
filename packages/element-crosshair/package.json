@@ -1,6 +1,6 @@
 {
   "name": "@cropper/element-crosshair",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A custom crosshair element for the Cropper.",
   "main": "dist/element-crosshair.raw.js",
   "module": "dist/element-crosshair.esm.raw.js",
@@ -26,11 +26,13 @@
         "node": {
           "production": "./dist/element-crosshair.min.js",
           "development": "./dist/element-crosshair.js",
-          "default": "./element-crosshair.raw.js"
+          "default": "./dist/element-crosshair.raw.js"
         },
         "default": "./dist/element-crosshair.raw.js"
       }
-    }
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "api-extractor": "api-extractor run --local --verbose",
@@ -58,8 +60,8 @@
   "bugs": "https://github.com/fengyuanchen/cropperjs/issues",
   "homepage": "https://github.com/fengyuanchen/cropperjs/tree/main/packages/element-crosshair/#readme",
   "dependencies": {
-    "@cropper/element": "^2.0.0",
-    "@cropper/utils": "^2.0.0"
+    "@cropper/element": "^2.1.0",
+    "@cropper/utils": "^2.1.0"
   },
   "publishConfig": {
     "access": "public"
