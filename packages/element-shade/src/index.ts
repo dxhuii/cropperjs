@@ -188,7 +188,7 @@ export default class CropperShade extends CropperElement {
       transform: `translate(${this.x}px, ${this.y}px)`,
       width: this.width,
       height: this.height,
-      outlineWidth: WINDOW.innerWidth,
+      outlineWidth: WINDOW.innerWidth * WINDOW.devicePixelRatio,
     });
   }
 }
