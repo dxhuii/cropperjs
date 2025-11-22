@@ -9,6 +9,7 @@ import {
   EVENT_ACTION_END,
   EVENT_ACTION_START,
   EVENT_CHANGE,
+  EVENT_RESIZE,
   WINDOW,
   isNumber,
   off,
@@ -22,6 +23,8 @@ export default class CropperShade extends CropperElement {
   static $name = CROPPER_SHADE;
 
   static $version = '__VERSION__';
+
+  protected $onWindowResize: EventListener | null = null;
 
   protected $onCanvasActionEnd: EventListener | null = null;
 
@@ -74,6 +77,7 @@ export default class CropperShade extends CropperElement {
       );
 
       if ($selection) {
+        this.$onWindowResize = this.$render.bind(this);
         this.$onCanvasActionStart = (event) => {
           if ($selection.hidden && (event as CustomEvent).detail.action === ACTION_SELECT) {
             this.hidden = false;
@@ -98,6 +102,7 @@ export default class CropperShade extends CropperElement {
             this.hidden = true;
           }
         };
+        on(window, EVENT_RESIZE, this.$onWindowResize);
         on($canvas, EVENT_ACTION_START, this.$onCanvasActionStart);
         on($canvas, EVENT_ACTION_END, this.$onCanvasActionEnd);
         on($canvas, EVENT_CHANGE, this.$onSelectionChange);
@@ -111,6 +116,11 @@ export default class CropperShade extends CropperElement {
     const { $canvas } = this;
 
     if ($canvas) {
+      if (this.$onWindowResize) {
+        off(window, EVENT_RESIZE, this.$onWindowResize);
+        this.$onWindowResize = null;
+      }
+
       if (this.$onCanvasActionStart) {
         off($canvas, EVENT_ACTION_START, this.$onCanvasActionStart);
         this.$onCanvasActionStart = null;
